@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import './styles.css';
+import { Container, Paper, Button, TextField, IconButton, Typography } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuidv4 } from 'uuid';
 
 const initialData = {
@@ -169,27 +170,39 @@ function App() {
   };
 
   return (
-    <div>
-      <h2>Kanban Board</h2>
+    <Container>
+      <Typography variant="h4" gutterBottom>Kanban Board</Typography>
       <div>
-        <input
-          type="text"
-          placeholder="New column name"
+        <TextField
+          label="New column name"
           value={newColumnName}
           onChange={e => setNewColumnName(e.target.value)}
+          variant="outlined"
+          size="small"
+          style={{ marginRight: 8 }}
         />
-        <button onClick={addColumn}>Add Column</button>
+        <Button variant="contained" color="primary" onClick={addColumn}>Add Column</Button>
       </div>
       <div>
-        <input
-          type="text"
-          placeholder="New task content"
+        <TextField
+          label="New task content"
           value={newTaskContent}
           onChange={e => setNewTaskContent(e.target.value)}
+          variant="outlined"
+          size="small"
+          style={{ marginRight: 8, marginTop: 16 }}
         />
-        <select
+        <TextField
+          select
+          label="Select Column"
           value={selectedColumn}
           onChange={e => setSelectedColumn(e.target.value)}
+          variant="outlined"
+          size="small"
+          SelectProps={{
+            native: true,
+          }}
+          style={{ marginRight: 8, marginTop: 16 }}
         >
           <option value="">Select Column</option>
           {state.columnOrder.map(columnId => (
@@ -197,8 +210,8 @@ function App() {
               {state.columns[columnId].title}
             </option>
           ))}
-        </select>
-        <button onClick={addTask}>Add Task</button>
+        </TextField>
+        <Button variant="contained" color="primary" onClick={addTask} style={{ marginTop: 16 }}>Add Task</Button>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         {state.columnOrder.map(columnId => {
@@ -208,36 +221,40 @@ function App() {
           return (
             <Droppable key={column.id} droppableId={column.id}>
               {provided => (
-                <div
+                <Paper
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="column"
+                  style={{ padding: 16, margin: 16, backgroundColor: '#f4f5f7' }}
                 >
-                  <h3>{column.title}</h3>
-                  <button className="delete-button" onClick={() => deleteColumn(column.id)}>×</button>
+                  <Typography variant="h6">{column.title}</Typography>
+                  <IconButton size="small" onClick={() => deleteColumn(column.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
+                    <DeleteIcon />
+                  </IconButton>
                   {tasks.map((task, index) => (
                     <Draggable key={task.id} draggableId={task.id} index={index}>
                       {provided => (
-                        <div
+                        <Paper
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="task"
+                          style={{ padding: 16, margin: '8px 0', backgroundColor: '#fff', position: 'relative' }}
                         >
                           {task.content}
-                          <button className="delete-button" onClick={() => deleteTask(column.id, task.id)}>×</button>
-                        </div>
+                          <IconButton size="small" onClick={() => deleteTask(column.id, task.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Paper>
                       )}
                     </Draggable>
                   ))}
                   {provided.placeholder}
-                </div>
+                </Paper>
               )}
             </Droppable>
           );
         })}
       </DragDropContext>
-    </div>
+    </Container>
   );
 }
 

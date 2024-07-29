@@ -4,24 +4,21 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
-
 .column {
-  border: 1px solid lightgrey;
-  border-radius: 2px;
+  background: #f4f5f7;
+  border-radius: 3px;
   width: 300px;
   padding: 8px;
   margin-right: 8px;
-  background-color: white;
-  display: inline-block;
-  vertical-align: top;
+  position: relative; /* 用于定位删除按钮 */
 }
 
 .task {
-  border: 1px solid lightgrey;
-  border-radius: 2px;
+  background: white;
+  border-radius: 3px;
   padding: 8px;
   margin-bottom: 8px;
-  background-color: white;
+  position: relative; /* 用于定位删除按钮 */
 }
 
 input, select {
