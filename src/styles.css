@@ -34,3 +34,18 @@ button {
   padding: 5px 10px;
 }
 
+.delete-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
