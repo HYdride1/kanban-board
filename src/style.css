@@ -1,0 +1,18 @@
+.board {
+    display: flex;
+  }
+  .column {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin: 0 10px;
+    border-radius: 4px;
+  }
+  .card {
+    background-color: #fff;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
