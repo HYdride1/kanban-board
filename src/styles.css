@@ -1,18 +1,25 @@
-.board {
-    display: flex;
-  }
-  .column {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    margin: 0 10px;
-    border-radius: 4px;
-  }
-  .card {
-    background-color: #fff;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.column {
+  border: 1px solid lightgrey;
+  border-radius: 2px;
+  width: 300px;
+  padding: 8px;
+  margin-right: 8px;
+  background-color: white;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.task {
+  border: 1px solid lightgrey;
+  border-radius: 2px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: white;
+}
