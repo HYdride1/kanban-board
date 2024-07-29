@@ -1,47 +1,26 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './styles.css';
+import { v4 as uuidv4 } from 'uuid';
 
 const initialData = {
-  tasks: {
-    'task-1': { id: 'task-1', content: 'Take out the garbage' },
-    'task-2': { id: 'task-2', content: 'Watch my favorite show' },
-    'task-3': { id: 'task-3', content: 'Charge my phone' },
-    'task-4': { id: 'task-4', content: 'Cook dinner' },
-  },
-  columns: {
-    'column-1': {
-      id: 'column-1',
-      title: 'To do',
-      taskIds: ['task-1', 'task-2', 'task-3', 'task-4'],
-    },
-    'column-2': {
-      id: 'column-2',
-      title: 'In Progress',
-      taskIds: [],
-    },
-    'column-3': {
-      id: 'column-3',
-      title: 'Done',
-      taskIds: [],
-    },
-  },
-  columnOrder: ['column-1', 'column-2', 'column-3'],
+  tasks: {},
+  columns: {},
+  columnOrder: [],
 };
 
 function App() {
   const [state, setState] = useState(initialData);
+  const [newColumnName, setNewColumnName] = useState('');
+  const [newTaskContent, setNewTaskContent] = useState('');
+  const [selectedColumn, setSelectedColumn] = useState('');
 
   const onDragEnd = result => {
     const { destination, source, draggableId } = result;
 
-    if (!destination) {
-      return;
-    }
+    if (!destination) return;
 
-    if (destination.droppableId === source.droppableId && destination.index === source.index) {
-      return;
-    }
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
     const start = state.columns[source.droppableId];
     const finish = state.columns[destination.droppableId];
@@ -68,7 +47,6 @@ function App() {
       return;
     }
 
-    // Moving from one column to another
     const startTaskIds = Array.from(start.taskIds);
     startTaskIds.splice(source.index, 1);
     const newStart = {
@@ -95,42 +73,126 @@ function App() {
     setState(newState);
   };
 
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {state.columnOrder.map(columnId => {
-        const column = state.columns[columnId];
-        const tasks = column.taskIds.map(taskId => state.tasks[taskId]);
+  const addColumn = () => {
+    const columnId = uuidv4();
+    const newColumn = {
+      id: columnId,
+      title: newColumnName,
+      taskIds: [],
+    };
 
-        return (
-          <Droppable key={column.id} droppableId={column.id}>
-            {provided => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="column"
-              >
-                <h3>{column.title}</h3>
-                {tasks.map((task, index) => (
-                  <Draggable key={task.id} draggableId={task.id} index={index}>
-                    {provided => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="task"
-                      >
-                        {task.content}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        );
-      })}
-    </DragDropContext>
+    const newState = {
+      ...state,
+      columns: {
+        ...state.columns,
+        [columnId]: newColumn,
+      },
+      columnOrder: [...state.columnOrder, columnId],
+    };
+
+    setState(newState);
+    setNewColumnName('');
+  };
+
+  const addTask = () => {
+    const taskId = uuidv4();
+    const newTask = {
+      id: taskId,
+      content: newTaskContent,
+    };
+
+    const column = state.columns[selectedColumn];
+    const newTaskIds = [...column.taskIds, taskId];
+    const newColumn = {
+      ...column,
+      taskIds: newTaskIds,
+    };
+
+    const newState = {
+      ...state,
+      tasks: {
+        ...state.tasks,
+        [taskId]: newTask,
+      },
+      columns: {
+        ...state.columns,
+        [newColumn.id]: newColumn,
+      },
+    };
+
+    setState(newState);
+    setNewTaskContent('');
+    setSelectedColumn('');
+  };
+
+  return (
+    <div>
+      <h2>Kanban Board</h2>
+      <div>
+        <input
+          type="text"
+          placeholder="New column name"
+          value={newColumnName}
+          onChange={e => setNewColumnName(e.target.value)}
+        />
+        <button onClick={addColumn}>Add Column</button>
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="New task content"
+          value={newTaskContent}
+          onChange={e => setNewTaskContent(e.target.value)}
+        />
+        <select
+          value={selectedColumn}
+          onChange={e => setSelectedColumn(e.target.value)}
+        >
+          <option value="">Select Column</option>
+          {state.columnOrder.map(columnId => (
+            <option key={columnId} value={columnId}>
+              {state.columns[columnId].title}
+            </option>
+          ))}
+        </select>
+        <button onClick={addTask}>Add Task</button>
+      </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        {state.columnOrder.map(columnId => {
+          const column = state.columns[columnId];
+          const tasks = column.taskIds.map(taskId => state.tasks[taskId]);
+
+          return (
+            <Droppable key={column.id} droppableId={column.id}>
+              {provided => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="column"
+                >
+                  <h3>{column.title}</h3>
+                  {tasks.map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                      {provided => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="task"
+                        >
+                          {task.content}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          );
+        })}
+      </DragDropContext>
+    </div>
   );
 }
 

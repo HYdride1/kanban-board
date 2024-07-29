@@ -23,3 +23,14 @@ body {
   margin-bottom: 8px;
   background-color: white;
 }
+
+input, select {
+  margin: 5px;
+  padding: 5px;
+}
+
+button {
+  margin: 5px;
+  padding: 5px 10px;
+}
+
