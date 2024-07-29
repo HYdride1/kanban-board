@@ -15,8 +15,18 @@ const initialData = {
       title: 'To do',
       taskIds: ['task-1', 'task-2', 'task-3', 'task-4'],
     },
+    'column-2': {
+      id: 'column-2',
+      title: 'In Progress',
+      taskIds: [],
+    },
+    'column-3': {
+      id: 'column-3',
+      title: 'Done',
+      taskIds: [],
+    },
   },
-  columnOrder: ['column-1'],
+  columnOrder: ['column-1', 'column-2', 'column-3'],
 };
 
 function App() {
@@ -33,21 +43,52 @@ function App() {
       return;
     }
 
-    const column = state.columns[source.droppableId];
-    const newTaskIds = Array.from(column.taskIds);
-    newTaskIds.splice(source.index, 1);
-    newTaskIds.splice(destination.index, 0, draggableId);
+    const start = state.columns[source.droppableId];
+    const finish = state.columns[destination.droppableId];
 
-    const newColumn = {
-      ...column,
-      taskIds: newTaskIds,
+    if (start === finish) {
+      const newTaskIds = Array.from(start.taskIds);
+      newTaskIds.splice(source.index, 1);
+      newTaskIds.splice(destination.index, 0, draggableId);
+
+      const newColumn = {
+        ...start,
+        taskIds: newTaskIds,
+      };
+
+      const newState = {
+        ...state,
+        columns: {
+          ...state.columns,
+          [newColumn.id]: newColumn,
+        },
+      };
+
+      setState(newState);
+      return;
+    }
+
+    // Moving from one column to another
+    const startTaskIds = Array.from(start.taskIds);
+    startTaskIds.splice(source.index, 1);
+    const newStart = {
+      ...start,
+      taskIds: startTaskIds,
+    };
+
+    const finishTaskIds = Array.from(finish.taskIds);
+    finishTaskIds.splice(destination.index, 0, draggableId);
+    const newFinish = {
+      ...finish,
+      taskIds: finishTaskIds,
     };
 
     const newState = {
       ...state,
       columns: {
         ...state.columns,
-        [newColumn.id]: newColumn,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
       },
     };
 
