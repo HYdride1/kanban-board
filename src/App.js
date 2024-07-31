@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Container, Paper, Button, TextField, IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { v4 as uuidv4 } from 'uuid';
 
 // 初始化数据
@@ -17,69 +18,6 @@ function App() {
   const [newColumnName, setNewColumnName] = useState(''); // 新列名称
   const [newTaskContent, setNewTaskContent] = useState(''); // 新任务内容
   const [selectedColumn, setSelectedColumn] = useState(''); // 选中的列
-
-  // 拖拽结束时的处理函数
-  const onDragEnd = result => {
-    const { destination, source, draggableId } = result;
-
-    // 如果没有目的地，直接返回
-    if (!destination) return;
-
-    // 如果目的地和来源相同且索引相同，直接返回
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
-    const start = state.columns[source.droppableId];
-    const finish = state.columns[destination.droppableId];
-
-    // 如果任务在同一列中拖拽，更新该列中的任务顺序
-    if (start === finish) {
-      const newTaskIds = Array.from(start.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
-
-      const newColumn = {
-        ...start,
-        taskIds: newTaskIds,
-      };
-
-      const newState = {
-        ...state,
-        columns: {
-          ...state.columns,
-          [newColumn.id]: newColumn,
-        },
-      };
-
-      setState(newState);
-      return;
-    }
-
-    // 如果任务在不同列中拖拽，更新两个列中的任务顺序
-    const startTaskIds = Array.from(start.taskIds);
-    startTaskIds.splice(source.index, 1);
-    const newStart = {
-      ...start,
-      taskIds: startTaskIds,
-    };
-
-    const finishTaskIds = Array.from(finish.taskIds);
-    finishTaskIds.splice(destination.index, 0, draggableId);
-    const newFinish = {
-      ...finish,
-      taskIds: finishTaskIds,
-    };
-
-    const newState = {
-      ...state,
-      columns: {
-        ...state.columns,
-        [newStart.id]: newStart,
-        [newFinish.id]: newFinish,
-      },
-    };
-
-    setState(newState);
-  };
 
   // 添加新列
   const addColumn = () => {
@@ -181,6 +119,70 @@ function App() {
     setState(newState);
   };
 
+  // 移动任务到上一个列
+  const moveTaskBackward = (columnId, taskId) => {
+    const columnIndex = state.columnOrder.indexOf(columnId);
+    if (columnIndex === 0) return; // 已经是第一个列
+
+    const prevColumnId = state.columnOrder[columnIndex - 1];
+    const prevColumn = state.columns[prevColumnId];
+    const newPrevTaskIds = [...prevColumn.taskIds, taskId];
+    const newPrevColumn = {
+      ...prevColumn,
+      taskIds: newPrevTaskIds,
+    };
+
+    const column = state.columns[columnId];
+    const newTaskIds = column.taskIds.filter(id => id !== taskId);
+    const newColumn = {
+      ...column,
+      taskIds: newTaskIds,
+    };
+
+    const newState = {
+      ...state,
+      columns: {
+        ...state.columns,
+        [prevColumnId]: newPrevColumn,
+        [columnId]: newColumn,
+      },
+    };
+
+    setState(newState);
+  };
+
+  // 移动任务到下一个列
+  const moveTaskForward = (columnId, taskId) => {
+    const columnIndex = state.columnOrder.indexOf(columnId);
+    if (columnIndex === state.columnOrder.length - 1) return; // 已经是最后一个列
+
+    const nextColumnId = state.columnOrder[columnIndex + 1];
+    const nextColumn = state.columns[nextColumnId];
+    const newNextTaskIds = [...nextColumn.taskIds, taskId];
+    const newNextColumn = {
+      ...nextColumn,
+      taskIds: newNextTaskIds,
+    };
+
+    const column = state.columns[columnId];
+    const newTaskIds = column.taskIds.filter(id => id !== taskId);
+    const newColumn = {
+      ...column,
+      taskIds: newTaskIds,
+    };
+
+    const newState = {
+      ...state,
+      columns: {
+        ...state.columns,
+        [nextColumnId]: newNextColumn,
+        [columnId]: newColumn,
+      },
+    };
+
+    setState(newState);
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>Kanban Board</Typography>
@@ -225,49 +227,35 @@ function App() {
         </TextField>
         <Button variant="contained" color="primary" onClick={addTask} style={{ marginTop: 16 }}>Add Task</Button>
       </div>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div style={{ display: 'flex', overflowX: 'auto', marginTop: 16 }}>
-          {state.columnOrder.map(columnId => {
-            const column = state.columns[columnId];
-            const tasks = column.taskIds.map(taskId => state.tasks[taskId]);
+      <div style={{ display: 'flex', overflowX: 'auto', marginTop: 16 }}>
+        {state.columnOrder.map(columnId => {
+          const column = state.columns[columnId];
+          const tasks = column.taskIds.map(taskId => state.tasks[taskId]);
 
-            return (
-              <Droppable key={column.id} droppableId={column.id}>
-                {provided => (
-                  <Paper
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    style={{ padding: 16, margin: 8, backgroundColor: '#f4f5f7', width: 300, position: 'relative' }}
-                  >
-                    <Typography variant="h6">{column.title}</Typography>
-                    <IconButton size="small" onClick={() => deleteColumn(column.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
-                      <DeleteIcon />
-                    </IconButton>
-                    {tasks.map((task, index) => (
-                      <Draggable key={task.id} draggableId={task.id} index={index}>
-                        {provided => (
-                          <Paper
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{ padding: 16, margin: '8px 0', backgroundColor: '#fff', position: 'relative' }}
-                          >
-                            {task.content}
-                            <IconButton size="small" onClick={() => deleteTask(column.id, task.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
-                              <DeleteIcon />
-                            </IconButton>
-                          </Paper>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </Paper>
-                )}
-              </Droppable>
-            );
-          })}
-        </div>
-      </DragDropContext>
+          return (
+            <Paper key={column.id} style={{ padding: 16, margin: 8, backgroundColor: '#f4f5f7', width: 300, position: 'relative' }}>
+              <Typography variant="h6">{column.title}</Typography>
+              <IconButton size="small" onClick={() => deleteColumn(column.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
+                <DeleteIcon />
+              </IconButton>
+              {tasks.map(task => (
+                <Paper key={task.id} style={{ padding: 16, margin: '8px 0', backgroundColor: '#fff', position: 'relative' }}>
+                  {task.content}
+                  <IconButton size="small" onClick={() => deleteTask(column.id, task.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton size="small" onClick={() => moveTaskBackward(column.id, task.id)} style={{ position: 'absolute', bottom: 8, left: 8 }}>
+                    <ArrowBackIcon />
+                  </IconButton>
+                  <IconButton size="small" onClick={() => moveTaskForward(column.id, task.id)} style={{ position: 'absolute', bottom: 8, right: 8 }}>
+                    <ArrowForwardIcon />
+                  </IconButton>
+                </Paper>
+              ))}
+            </Paper>
+          );
+        })}
+      </div>
     </Container>
   );
 }
