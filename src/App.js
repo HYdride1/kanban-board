@@ -241,15 +241,19 @@ function App() {
               {tasks.map(task => (
                 <Paper key={task.id} style={{ padding: 16, margin: '8px 0', backgroundColor: '#fff', position: 'relative' }}>
                   {task.content}
-                  <IconButton size="small" onClick={() => deleteTask(column.id, task.id)} style={{ position: 'absolute', top: 8, right: 8 }}>
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => moveTaskBackward(column.id, task.id)} style={{ position: 'absolute', bottom: 8, left: 8 }}>
-                    <ArrowBackIcon />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => moveTaskForward(column.id, task.id)} style={{ position: 'absolute', bottom: 8, right: 8 }}>
-                    <ArrowForwardIcon />
-                  </IconButton>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                    <IconButton size="small" onClick={() => moveTaskBackward(column.id, task.id)}>
+                      <ArrowBackIcon />
+                    </IconButton>
+                    <IconButton size="small" onClick={() => moveTaskForward(column.id, task.id)}>
+                      <ArrowForwardIcon />
+                    </IconButton>
+                  </div>
+                  <div style={{ position: 'absolute', top: 8, right: 8 }}>
+                    <IconButton size="small" onClick={() => deleteTask(column.id, task.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </div>
                 </Paper>
               ))}
             </Paper>
