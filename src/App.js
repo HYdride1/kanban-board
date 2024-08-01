@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<SignIn />} />
         <Route path="/kanban" element={<Kanban />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Kanban />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
