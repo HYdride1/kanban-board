@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,6 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -30,7 +30,7 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignIn() {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -39,9 +39,7 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
-
-    // 这里应该执行登录逻辑，成功后重定向到看板页面
-    history.push('/kanban');
+    navigate('/kanban'); // 重定向到看板页面
   };
 
   return (
