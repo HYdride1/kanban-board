@@ -1,16 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Kanban from './components/kanban';
-import SignIn from './components/signIn.js';
+import SignIn from './components/signIn';
 
 function App() {
   return (
     <Router>
-      <Switch>
-        <Route path="/login" component={SignIn} />
-        <Route path="/kanban" component={Kanban} />
-        <Redirect from="/" to="/login" />
-      </Switch>
+      <Routes>
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/kanban" element={<Kanban />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
     </Router>
   );
 }
