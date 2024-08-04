@@ -1,3 +1,5 @@
+git仓库地址：[HYdride1/kanban-board (github.com)](https://github.com/HYdride1/kanban-board/tree/master)
+
 #### 如何构建应用
 
 将github中的内容clone到本地,默认此时在kanban-board文件夹下,开启一个终端:
