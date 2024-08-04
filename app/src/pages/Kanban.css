@@ -1,0 +1,63 @@
+/* src/pages/Kanban.css */
+.kanban-container {
+    padding: 20px;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .kanban-title {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+    color: #1890ff;
+    font-weight: bold;
+  }
+  
+  .kanban-board {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+  }
+  
+  .kanban-column {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    flex-shrink: 0;
+    padding: 10px;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .kanban-column:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .kanban-column-card {
+    height: 100%;
+  }
+  
+  .kanban-task-card {
+    margin-bottom: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .kanban-task-card:hover {
+    background-color: #f6f8fa;
+  }
+  
+  .ant-card-meta-title {
+    font-weight: bold;
+  }
+  
+  .ant-card-meta-description {
+    color: #595959;
+  }
+  
